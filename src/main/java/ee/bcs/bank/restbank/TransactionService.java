@@ -189,7 +189,7 @@ public class TransactionService {
 
                 // kontrollime kas saaja kontonumber eksisteerib meie andmebaasis (bank)
                 if (accountService.accountNumberExists(accounts, receiverAccountNumber)) {
-                  AccountDto receiverAccount = accountService.getAccountByNumber(accounts, receiverAccountNumber);
+                    AccountDto receiverAccount = accountService.getAccountByNumber(accounts, receiverAccountNumber);
                     int receiverNewBalance = receiverAccount.getBalance() + amount;
 
 
@@ -214,45 +214,42 @@ public class TransactionService {
 
                 return requestResult;
 
-            case RECEIVE_MONEY:
-               receiverAccountNumber = transactionDto.getReceiverAccountNumber();
-
-               if (!accountService.accountNumberExists(accounts, receiverAccountNumber)) {
-                    requestResult.setError("No such account number exists: " + receiverAccountNumber);
-                    return requestResult;
-                }
-                AccountDto receiverAccount = accountService.getAccountByNumber(accounts, receiverAccountNumber);
-
-
-
-                // arvutame uue balance
-                newBalance = balance + amount;
-                // täidame ära transactionDto
-                transactionDto.setSenderAccountNumber(ATM);
-                transactionDto.setSenderAccountNumber(account.getAccountNumber());
-                transactionDto.setBalance(newBalance);
-                transactionDto.setLocalDateTime(LocalDateTime.now());
-                transactionDto.setId(transactionId);
-
-                // lisame tehingu transactionte alla (pluss inkrementeerime)
-                bank.addTransactionToTransaction(transactionDto);
-                bank.incrementTransactionId();
-
-                // uuendame konto balance
-                account.setBalance(newBalance);
-
-                // meisterdame valemis result objekti
-                requestResult.setTransactionId(transactionId);
-                requestResult.setAccountId(accountId);
-                requestResult.setMessage("Successfully made deposited " + amount);
-                return requestResult;
 
             default:
                 requestResult.setError("Unknown transaction type: " + transactionType);
                 return requestResult;
-
-
         }
+
+    }
+
+    public RequestResult receiveNewTransaction(Bank bank, TransactionDto transactionDto) {
+        RequestResult requestResult = new RequestResult();
+        String receiverAccountNumber = transactionDto.getReceiverAccountNumber();
+        List<AccountDto> accounts = bank.getAccounts();
+
+        if (!accountService.accountNumberExists(accounts, receiverAccountNumber)) {
+            requestResult.setError("No such account in our bank. " + receiverAccountNumber);
+            return requestResult;
+        }
+
+        AccountDto receiverAccount = accountService.getAccountByNumber(accounts, receiverAccountNumber);
+        int transactionId = bank.getTransactionIdCount();
+        int receiverNewBalance = receiverAccount.getBalance() + transactionDto.getAmount();
+
+        transactionDto.setTransactionType(RECEIVE_MONEY);
+        transactionDto.setBalance(receiverNewBalance);
+        transactionDto.setId(transactionId);
+        transactionDto.setAccountId(receiverAccount.getBalance());
+        transactionDto.setLocalDateTime(LocalDateTime.now());
+
+        bank.addTransactionToTransaction(transactionDto);
+        bank.incrementTransactionId();
+        receiverAccount.setBalance(receiverNewBalance);
+
+        requestResult.setTransactionId(transactionId);
+        requestResult.setMessage("Transaction received");
+        return requestResult;
+
 
 
     }
