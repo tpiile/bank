@@ -89,8 +89,22 @@ public class AccountService {
         requestResult.setMessage("Successfully updated account. ");
         return requestResult;
 
-
-
-
     }
+
+    public RequestResult deleteAccount(List<AccountDto> accounts, int accountId) {
+        RequestResult requestResult = new RequestResult();
+
+        if (!accountIdExists(accounts, accountId)) {
+            requestResult.setError("Account ID: " + accountId + "dose not exist!");
+            return requestResult;
+
+        }
+        AccountDto account = getAccountById(accounts, accountId);
+        accounts.remove(account);
+
+        requestResult.setMessage("Account deleted");
+        requestResult.setAccountId(accountId);
+        return requestResult;
+
+        }
 }
