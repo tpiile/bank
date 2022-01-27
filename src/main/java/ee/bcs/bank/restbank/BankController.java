@@ -73,6 +73,13 @@ public class BankController {
         return transactionService.receiveNewTransaction(bank, transactionDto);
     }
 
+    @PutMapping("/update/owner")
+    public RequestResult updateOwnerDetails(@RequestBody AccountDto accountDto) {
+
+
+        return accountService.updateOwnerDetails(bank.getAccounts(), accountDto);
+    }
+
 
     //  loo transactionService alla uus teenus                                      createTransactionForNewAccount()
     //  loo bankService alla uus teenus                                             addTransaction()
