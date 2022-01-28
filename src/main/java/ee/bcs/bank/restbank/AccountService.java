@@ -106,5 +106,20 @@ public class AccountService {
         requestResult.setAccountId(accountId);
         return requestResult;
 
+    }
+
+    public RequestResult updateLockStatus(List<AccountDto> accounts, AccountDto accountDto) {
+        RequestResult requestResult = new RequestResult();
+        if (!accountIdExists(accounts, accountDto.getId())) {
+            requestResult.setError("Account ID: " + accountDto.getId() + "dose not exist!");
+            return requestResult;
         }
+        AccountDto account = getAccountById(accounts, accountDto.getId());
+        account.setLocked(accountDto.getLocked());
+
+        requestResult.setAccountId(account.getId());
+        requestResult.setMessage("Locked: " + account.getLocked());
+
+        return requestResult;
+    }
 }

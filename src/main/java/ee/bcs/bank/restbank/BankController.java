@@ -79,7 +79,13 @@ public class BankController {
 
         return accountService.updateOwnerDetails(bank.getAccounts(), accountDto);
     }
-    //todo: tehke endpoint, millega saab kontot lukustada/avada. Kontrollige ka ID olemasolu
+    //todo 28.01: tehke endpoint, millega saab kontot lukustada/avada. Kontrollige ka ID olemasolu
+
+    @PutMapping("/update/lock")
+    public RequestResult updateLockStatus(@RequestBody AccountDto accountDto) {
+
+        return accountService.updateLockStatus(bank.getAccounts(), accountDto);
+    }
 
     @DeleteMapping("/delete/account")
     public RequestResult deleteAccount(@RequestParam int accountId) {
@@ -87,8 +93,7 @@ public class BankController {
         return accountService.deleteAccount(bank.getAccounts(), accountId);
     }
 
-    //  loo transactionService alla uus teenus                                      createTransactionForNewAccount()
-    //  loo bankService alla uus teenus                                             addTransaction()
 
+    // todo: loo endpoint /bankstatement/
 
 }
